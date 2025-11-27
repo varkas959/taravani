@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
 
     // Find admin user (use the authenticated admin's ID)
     const adminRecord = await prisma.admin.findUnique({
-      where: { id: admin.id },
+      where: { id: adminId },
     });
 
     if (!adminRecord) {
@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
 
     // Update password
     await prisma.admin.update({
-      where: { id: admin.id },
+      where: { id: adminId },
       data: { password: hashedPassword },
     });
 
