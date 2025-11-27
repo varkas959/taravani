@@ -155,7 +155,7 @@ export default function Home() {
               <span className="text-sm sm:text-base font-serif font-semibold text-[#0a0e27]">Taravani</span>
               <Link
                 href="/form/step1"
-                className="bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] text-white px-4 py-2 md:px-6 md:py-2 rounded-md font-medium hover:from-[#4f46e5] hover:to-[#7c3aed] transition-all shadow-sm text-xs sm:text-sm whitespace-nowrap"
+                className="bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] text-white px-4 py-2 md:px-6 md:py-2 rounded-full font-medium hover:from-[#4f46e5] hover:to-[#7c3aed] transition-all shadow-sm text-xs sm:text-sm whitespace-nowrap"
               >
                 Get My Reading →
               </Link>
@@ -195,18 +195,18 @@ export default function Home() {
             {/* Enhanced CTA Button */}
             <div className="relative inline-block mb-6 md:mb-8 group">
               {/* Animated glow effect - pulsing outer glow */}
-              <div className="absolute -inset-2 bg-gradient-to-r from-[#6366f1] via-[#8b5cf6] to-[#6366f1] rounded-lg blur-md opacity-40 group-hover:opacity-60 animate-pulse"></div>
-              <div className="absolute -inset-1 bg-gradient-to-r from-[#6366f1] via-[#8b5cf6] to-[#6366f1] rounded-lg blur-sm opacity-30 group-hover:opacity-50"></div>
+              <div className="absolute -inset-2 bg-gradient-to-r from-[#6366f1] via-[#8b5cf6] to-[#6366f1] rounded-full blur-md opacity-40 group-hover:opacity-60 animate-pulse"></div>
+              <div className="absolute -inset-1 bg-gradient-to-r from-[#6366f1] via-[#8b5cf6] to-[#6366f1] rounded-full blur-sm opacity-30 group-hover:opacity-50"></div>
               
               {/* Shimmer animation overlay - continuous */}
-              <div className="absolute inset-0 rounded-lg overflow-hidden pointer-events-none">
+              <div className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
                 <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent animate-shimmer"></div>
               </div>
               
               {/* Button */}
               <Link
                 href="/form/step1"
-                className="relative inline-block bg-gradient-to-b from-[#5b6ee8] via-[#6366f1] to-[#4f46e5] text-white px-8 py-3 md:px-10 md:py-4 rounded-lg font-semibold hover:from-[#4f46e5] hover:via-[#5b6ee8] hover:to-[#4338ca] transition-all shadow-xl hover:shadow-2xl text-base md:text-lg border-2 border-[#7c8ef5]/90 hover:border-[#8b9aff] transform hover:scale-105"
+                className="relative inline-block bg-gradient-to-b from-[#5b6ee8] via-[#6366f1] to-[#4f46e5] text-white px-8 py-3 md:px-10 md:py-4 rounded-full font-semibold hover:from-[#4f46e5] hover:via-[#5b6ee8] hover:to-[#4338ca] transition-all shadow-xl hover:shadow-2xl text-base md:text-lg border-2 border-[#7c8ef5]/90 hover:border-[#8b9aff] transform hover:scale-105"
               >
                 Get My Personal Reading
               </Link>
@@ -220,7 +220,7 @@ export default function Home() {
                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
                   </svg>
                 </div>
-                <span className="text-xs sm:text-sm md:text-base font-medium text-[#0a0e27]">Delivered within 48 hours</span>
+                <span className="text-xs sm:text-sm md:text-base font-medium text-[#0a0e27] text-left">Delivered within 48 hours</span>
               </div>
               <div className="flex w-full sm:w-auto gap-3">
                 <div className="flex-1 sm:flex-auto flex items-center gap-2 md:gap-3 bg-white/80 backdrop-blur-sm px-4 py-2 md:px-5 md:py-3 rounded-full shadow-sm border border-[#e5e7eb] hover:shadow-md transition-all">
@@ -229,7 +229,7 @@ export default function Home() {
                       <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
                     </svg>
                   </div>
-                  <span className="text-xs sm:text-sm md:text-base font-medium text-[#0a0e27]">100% confidential</span>
+                  <span className="text-xs sm:text-sm md:text-base font-medium text-[#0a0e27] text-left">100% confidential</span>
                 </div>
                 <div className="flex-1 sm:flex-auto flex items-center gap-2 md:gap-3 bg-white/80 backdrop-blur-sm px-4 py-2 md:px-5 md:py-3 rounded-full shadow-sm border border-[#e5e7eb] hover:shadow-md transition-all">
                   <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#d4af37]/10 flex items-center justify-center">
@@ -237,7 +237,7 @@ export default function Home() {
                       <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
                     </svg>
                   </div>
-                  <span className="text-xs sm:text-sm md:text-base font-medium text-[#0a0e27]">Human-written</span>
+                  <span className="text-xs sm:text-sm md:text-base font-medium text-[#0a0e27] text-left">Human-written</span>
                 </div>
               </div>
             </div>
@@ -484,15 +484,9 @@ export default function Home() {
           {/* CTAs */}
           <div className="text-center space-y-4">
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-              <button className="bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] text-white px-8 py-3 md:px-10 md:py-4 rounded-lg font-semibold hover:from-[#4f46e5] hover:to-[#7c3aed] transition-all shadow-lg hover:shadow-xl text-base md:text-lg">
-                Download Complete Sample Report (PDF)
+              <button className="bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] text-white px-8 py-3 md:px-10 md:py-4 rounded-full font-semibold hover:from-[#4f46e5] hover:to-[#7c3aed] transition-all shadow-lg hover:shadow-xl text-base md:text-lg">
+                Download sample report
               </button>
-              <Link
-                href="/form/step1"
-                className="bg-white border-2 border-[#6366f1] text-[#6366f1] px-8 py-3 md:px-10 md:py-4 rounded-lg font-semibold hover:bg-[#6366f1] hover:text-white transition-all shadow-lg hover:shadow-xl text-base md:text-lg"
-              >
-                Get My Personal Reading for ₹499
-              </Link>
             </div>
             <p className="text-sm md:text-base text-[#4a5568] max-w-2xl mx-auto px-4">
               This sample is from a real client report. Your report will be equally detailed and personalized to your unique birth chart.
@@ -617,7 +611,7 @@ export default function Home() {
           <div className="text-center mt-8 md:mt-12 lg:mt-16 px-4">
             <Link
               href="/form/step1"
-              className="inline-block bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] text-white px-8 py-3 md:px-10 md:py-4 rounded-lg font-medium hover:from-[#4f46e5] hover:to-[#7c3aed] transition-all shadow-lg hover:shadow-xl text-base md:text-lg"
+              className="inline-block bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] text-white px-8 py-3 md:px-10 md:py-4 rounded-full font-medium hover:from-[#4f46e5] hover:to-[#7c3aed] transition-all shadow-lg hover:shadow-xl text-base md:text-lg"
             >
               Get My Reading →
             </Link>
@@ -666,7 +660,7 @@ export default function Home() {
             
             <Link
               href="/form/step1"
-              className="block w-full bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] text-white px-6 py-3 md:px-8 md:py-4 rounded-lg font-medium hover:from-[#4f46e5] hover:to-[#7c3aed] transition-all shadow-lg hover:shadow-xl text-base md:text-lg"
+              className="block w-full bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] text-white px-6 py-3 md:px-8 md:py-4 rounded-full font-medium hover:from-[#4f46e5] hover:to-[#7c3aed] transition-all shadow-lg hover:shadow-xl text-base md:text-lg"
             >
               Get My Reading for ₹499
             </Link>
@@ -797,7 +791,7 @@ export default function Home() {
                 <button
                   type="submit"
                   disabled={isContactSubmitting}
-                  className="w-full bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] text-white px-6 py-3 rounded-lg font-medium hover:from-[#4f46e5] hover:to-[#7c3aed] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] text-white px-6 py-3 rounded-full font-medium hover:from-[#4f46e5] hover:to-[#7c3aed] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isContactSubmitting ? "Sending..." : "Send Message"}
                 </button>
@@ -815,7 +809,7 @@ export default function Home() {
           </p>
           <Link
             href="/form/step1"
-            className="inline-block bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] text-white px-8 py-3 md:px-10 md:py-4 rounded-lg font-medium hover:from-[#4f46e5] hover:to-[#7c3aed] transition-all shadow-lg hover:shadow-xl text-base md:text-lg"
+            className="inline-block bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] text-white px-8 py-3 md:px-10 md:py-4 rounded-full font-medium hover:from-[#4f46e5] hover:to-[#7c3aed] transition-all shadow-lg hover:shadow-xl text-base md:text-lg"
           >
             Start My Reading →
           </Link>
@@ -886,7 +880,7 @@ export default function Home() {
               />
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] text-white px-6 py-3 rounded-lg font-medium hover:from-[#4f46e5] hover:to-[#7c3aed] transition-all"
+              className="w-full bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] text-white px-6 py-3 rounded-full font-medium hover:from-[#4f46e5] hover:to-[#7c3aed] transition-all"
               >
                 Claim My Discount
               </button>
