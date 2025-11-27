@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
+import { verifyAdminSession } from "@/lib/auth";
 
 const changePasswordSchema = z.object({
   adminId: z.string(),
@@ -11,10 +12,27 @@ const changePasswordSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Verify admin authentication
+    const admin = await verifyAdminSession(request);
+    if (!admin) {
+      return NextResponse.json(
+        { message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const { adminId, currentPassword, newPassword } = changePasswordSchema.parse(body);
 
-    // Find admin user (use the authenticated admin's ID)
+    // Verify the adminId matches the authenticated admin
+    if (adminId !== admin.id) {
+      return NextResponse.json(
+        { message: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
+    // Find admin user
     const adminRecord = await prisma.admin.findUnique({
       where: { id: adminId },
     });
