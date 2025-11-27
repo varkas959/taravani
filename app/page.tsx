@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useState, useEffect } from "react";
 
 const testimonialsData = [
@@ -151,7 +152,7 @@ export default function Home() {
         <div className="fixed top-0 left-0 right-0 bg-white border-b border-[#e0e0e0] shadow-md z-50 transition-all duration-300">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-14 md:h-16 gap-4">
-              <span className="text-xs sm:text-sm font-serif font-semibold text-[#0a0e27]">Taravani</span>
+              <span className="text-sm sm:text-base font-serif font-semibold text-[#0a0e27]">Taravani</span>
               <Link
                 href="/form/step1"
                 className="bg-gradient-to-r from-[#6366f1] to-[#8b5cf6] text-white px-4 py-2 md:px-6 md:py-2 rounded-md font-medium hover:from-[#4f46e5] hover:to-[#7c3aed] transition-all shadow-sm text-xs sm:text-sm whitespace-nowrap"
@@ -212,8 +213,8 @@ export default function Home() {
             </div>
             
             {/* Enhanced Badges */}
-            <div className="flex flex-wrap justify-center gap-4 md:gap-6 px-4">
-              <div className="flex items-center gap-2 md:gap-3 bg-white/80 backdrop-blur-sm px-4 py-2 md:px-5 md:py-3 rounded-full shadow-sm border border-[#e5e7eb] hover:shadow-md transition-all basis-full md:basis-auto min-w-[180px]">
+            <div className="flex flex-wrap justify-center gap-3 md:gap-4 px-4">
+              <div className="flex items-center gap-2 md:gap-3 bg-white/80 backdrop-blur-sm px-4 py-2 md:px-5 md:py-3 rounded-full shadow-sm border border-[#e5e7eb] hover:shadow-md transition-all w-full sm:w-auto">
                 <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#d4af37]/10 flex items-center justify-center">
                   <svg className="w-4 h-4 md:w-5 md:h-5 text-[#d4af37]" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
@@ -221,21 +222,23 @@ export default function Home() {
                 </div>
                 <span className="text-xs sm:text-sm md:text-base font-medium text-[#0a0e27]">Delivered within 48 hours</span>
               </div>
-              <div className="flex items-center gap-2 md:gap-3 bg-white/80 backdrop-blur-sm px-4 py-2 md:px-5 md:py-3 rounded-full shadow-sm border border-[#e5e7eb] hover:shadow-md transition-all basis-1/2 md:basis-auto min-w-[160px]">
-                <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#d4af37]/10 flex items-center justify-center">
-                  <svg className="w-4 h-4 md:w-5 md:h-5 text-[#d4af37]" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
-                  </svg>
+              <div className="flex w-full sm:w-auto gap-3">
+                <div className="flex-1 sm:flex-auto flex items-center gap-2 md:gap-3 bg-white/80 backdrop-blur-sm px-4 py-2 md:px-5 md:py-3 rounded-full shadow-sm border border-[#e5e7eb] hover:shadow-md transition-all">
+                  <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#d4af37]/10 flex items-center justify-center">
+                    <svg className="w-4 h-4 md:w-5 md:h-5 text-[#d4af37]" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/>
+                    </svg>
+                  </div>
+                  <span className="text-xs sm:text-sm md:text-base font-medium text-[#0a0e27]">100% confidential</span>
                 </div>
-                <span className="text-xs sm:text-sm md:text-base font-medium text-[#0a0e27]">100% confidential</span>
-              </div>
-              <div className="flex items-center gap-2 md:gap-3 bg-white/80 backdrop-blur-sm px-4 py-2 md:px-5 md:py-3 rounded-full shadow-sm border border-[#e5e7eb] hover:shadow-md transition-all basis-1/2 md:basis-auto min-w-[160px]">
-                <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#d4af37]/10 flex items-center justify-center">
-                  <svg className="w-4 h-4 md:w-5 md:h-5 text-[#d4af37]" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-                  </svg>
+                <div className="flex-1 sm:flex-auto flex items-center gap-2 md:gap-3 bg-white/80 backdrop-blur-sm px-4 py-2 md:px-5 md:py-3 rounded-full shadow-sm border border-[#e5e7eb] hover:shadow-md transition-all">
+                  <div className="w-6 h-6 md:w-8 md:h-8 rounded-full bg-[#d4af37]/10 flex items-center justify-center">
+                    <svg className="w-4 h-4 md:w-5 md:h-5 text-[#d4af37]" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                    </svg>
+                  </div>
+                  <span className="text-xs sm:text-sm md:text-base font-medium text-[#0a0e27]">Human-written</span>
                 </div>
-                <span className="text-xs sm:text-sm md:text-base font-medium text-[#0a0e27]">Human-written</span>
               </div>
             </div>
           </div>
@@ -508,10 +511,8 @@ export default function Home() {
             
             <div className="bg-white rounded-2xl p-6 md:p-8 lg:p-12 shadow-lg border border-[#e5e7eb]">
               <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8 mb-6 md:mb-8">
-                <div className="w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 rounded-full bg-gradient-to-br from-[#6366f1] to-[#8b5cf6] flex items-center justify-center flex-shrink-0 shadow-lg">
-                  <svg className="w-16 h-16 md:w-20 md:h-20 lg:w-24 lg:h-24 text-white" fill="currentColor" viewBox="0 0 24 24">
-                    <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
-                  </svg>
+                <div className="relative w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 rounded-full overflow-hidden shadow-lg border-4 border-white">
+                  <Image src="/images/astrologer.jpg" alt="Krishna - Taravani Astrologer" fill className="object-cover" sizes="(max-width: 768px) 128px, 192px" priority />
                 </div>
                 
                 <div className="text-center md:text-left flex-1">
@@ -555,41 +556,57 @@ export default function Home() {
             Real experiences from those who've received their personalized readings
           </p>
           
-          <div className="relative">
+          <div className="hidden md:grid md:grid-cols-3 gap-8">
+            {testimonialsData.map((testimonial) => (
+              <div key={testimonial.author} className="bg-gradient-to-br from-white to-[#f8f9fa] rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-lg transition-all border border-[#e5e7eb]">
+                <div className="flex gap-1 mb-3 md:mb-4">
+                  {Array.from({ length: testimonial.rating }).map((_, i) => (
+                    <svg key={`${testimonial.author}-desktop-${i}`} className="w-4 h-4 md:w-5 md:h-5 text-[#d4af37]" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                    </svg>
+                  ))}
+                </div>
+                <p className="text-sm md:text-base text-[#4a5568] mb-4 md:mb-6 leading-relaxed italic">
+                  "{testimonial.quote}"
+                </p>
+                <p className="text-xs md:text-sm font-semibold text-[#0a0e27]">— {testimonial.author}</p>
+              </div>
+            ))}
+          </div>
+          <div className="md:hidden relative">
             <div className="overflow-hidden">
               <div
                 className="flex transition-transform duration-700 ease-in-out"
                 style={{
                   transform: `translateX(-${testimonialIndex * 100}%)`,
-                  width: `${testimonialsData.length * 100}%`,
                 }}
               >
-                {testimonialsData.map((testimonial, index) => (
-                  <div key={testimonial.author} className="min-w-full px-2 sm:px-4">
-                    <div className="bg-gradient-to-br from-white to-[#f8f9fa] rounded-2xl p-6 md:p-8 shadow-sm hover:shadow-lg transition-all border border-[#e5e7eb] h-full">
-                      <div className="flex gap-1 mb-3 md:mb-4">
+                {testimonialsData.map((testimonial) => (
+                  <div key={`${testimonial.author}-mobile`} className="min-w-full px-2">
+                    <div className="bg-gradient-to-br from-white to-[#f8f9fa] rounded-2xl p-6 shadow-sm border border-[#e5e7eb] h-full">
+                      <div className="flex gap-1 mb-3">
                         {Array.from({ length: testimonial.rating }).map((_, i) => (
-                          <svg key={`${testimonial.author}-${i}`} className="w-4 h-4 md:w-5 md:h-5 text-[#d4af37]" fill="currentColor" viewBox="0 0 24 24">
+                          <svg key={`${testimonial.author}-mobile-${i}`} className="w-4 h-4 text-[#d4af37]" fill="currentColor" viewBox="0 0 24 24">
                             <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
                           </svg>
                         ))}
                       </div>
-                      <p className="text-sm md:text-base text-[#4a5568] mb-4 md:mb-6 leading-relaxed italic">
+                      <p className="text-sm text-[#4a5568] mb-4 leading-relaxed italic">
                         "{testimonial.quote}"
                       </p>
-                      <p className="text-xs md:text-sm font-semibold text-[#0a0e27]">— {testimonial.author}</p>
+                      <p className="text-xs font-semibold text-[#0a0e27]">— {testimonial.author}</p>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
-            <div className="flex justify-center gap-2 mt-6">
+            <div className="flex justify-center gap-2 mt-4">
               {testimonialsData.map((_, index) => (
                 <button
-                  key={`testimonial-dot-${index}`}
+                  key={`testimonial-dot-mobile-${index}`}
                   type="button"
                   onClick={() => setTestimonialIndex(index)}
-                  className={`w-3 h-3 rounded-full transition-all ${testimonialIndex === index ? "bg-[#6366f1]" : "bg-gray-300"}`}
+                  className={`w-2.5 h-2.5 rounded-full transition-all ${testimonialIndex === index ? "bg-[#6366f1]" : "bg-gray-300"}`}
                   aria-label={`Show testimonial ${index + 1}`}
                 />
               ))}
