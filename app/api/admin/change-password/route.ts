@@ -5,7 +5,6 @@ import { z } from "zod";
 import { verifyAdminSession } from "@/lib/auth";
 
 const changePasswordSchema = z.object({
-  adminId: z.string(),
   currentPassword: z.string().min(1),
   newPassword: z.string().min(8, "Password must be at least 8 characters"),
 });
@@ -22,15 +21,8 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { adminId, currentPassword, newPassword } = changePasswordSchema.parse(body);
-
-    // Verify the adminId matches the authenticated admin
-    if (adminId !== admin.id) {
-      return NextResponse.json(
-        { message: "Unauthorized" },
-        { status: 401 }
-      );
-    }
+    const { currentPassword, newPassword } = changePasswordSchema.parse(body);
+    const adminId = admin.id;
 
     // Find admin user
     const adminRecord = await prisma.admin.findUnique({
