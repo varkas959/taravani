@@ -38,3 +38,12 @@ model Reading {
   paymentStatus     String?  // PENDING, PAID, FAILED
   amount            Int?     @default(49900) // Amount in paise (₹499 = 49900 paise)
 }
+
+model Contact {
+  id        String   @id @default(cuid())
+  name      String
+  email     String
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}

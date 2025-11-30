@@ -245,9 +245,17 @@ export default function AdminDashboard() {
       <nav className="border-b border-[#e0e0e0] bg-white sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            <h1 className="text-xl font-serif font-semibold text-[#1a1a2e]">
-              Admin Dashboard
-            </h1>
+            <div className="flex items-center gap-4">
+              <h1 className="text-xl font-serif font-semibold text-[#1a1a2e]">
+                Admin Dashboard
+              </h1>
+              <Link
+                href="/admin/contacts"
+                className="text-sm text-[#4a4a5e] hover:text-[#1a1a2e] transition-colors"
+              >
+                Contact Messages
+              </Link>
+            </div>
             <button
               onClick={handleLogout}
               className="text-sm text-[#4a4a5e] hover:text-[#1a1a2e] transition-colors"
