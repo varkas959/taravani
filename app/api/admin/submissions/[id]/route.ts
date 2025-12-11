@@ -82,9 +82,14 @@ export async function PATCH(
     // If sendEmail is true, trigger email sending
     if (validated.sendEmail && reading.reportText) {
       try {
+        // Get the authorization header from the original request
+        const authHeader = request.headers.get("authorization");
         const emailResponse = await fetch(`${request.nextUrl.origin}/api/admin/send-email`, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { 
+            "Content-Type": "application/json",
+            ...(authHeader && { "Authorization": authHeader }),
+          },
           body: JSON.stringify({
             readingId: reading.id,
             email: reading.email,
