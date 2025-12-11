@@ -4,6 +4,9 @@ import { join } from "path";
 import { verifyAdminSession } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 
+// Check if we're on Vercel (read-only filesystem)
+const isVercel = process.env.VERCEL === "1" || process.env.VERCEL_ENV;
+
 export async function POST(request: NextRequest) {
   try {
     // Verify admin authentication
@@ -49,35 +52,48 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Create uploads directory if it doesn't exist
-    const uploadsDir = join(process.cwd(), "public", "uploads");
-    try {
-      await mkdir(uploadsDir, { recursive: true });
-    } catch (error) {
-      // Directory might already exist
-    }
+    // Get file data
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
 
     // Generate unique filename
     const timestamp = Date.now();
     const filename = `${readingId}-${timestamp}.pdf`;
-    const filepath = join(uploadsDir, filename);
 
-    // Save file
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
-    await writeFile(filepath, buffer);
+    let pdfPath: string | null = null;
+    let pdfData: string | null = null;
 
-    // Update reading with PDF path
-    const relativePath = `/uploads/${filename}`;
+    if (isVercel) {
+      // On Vercel: Store as base64 in database
+      pdfData = buffer.toString("base64");
+    } else {
+      // Local development: Save to file system
+      try {
+        const uploadsDir = join(process.cwd(), "public", "uploads");
+        await mkdir(uploadsDir, { recursive: true });
+        const filepath = join(uploadsDir, filename);
+        await writeFile(filepath, buffer);
+        pdfPath = `/uploads/${filename}`;
+      } catch (error) {
+        // If file system write fails, fall back to base64 storage
+        console.warn("Failed to write to file system, using base64 storage:", error);
+        pdfData = buffer.toString("base64");
+      }
+    }
+
+    // Update reading with PDF data
     await prisma.reading.update({
       where: { id: readingId },
-      data: { reportPdfPath: relativePath },
+      data: {
+        reportPdfPath: pdfPath,
+        reportPdfData: pdfData,
+      },
     });
 
     return NextResponse.json({
       success: true,
       message: "PDF uploaded successfully",
-      path: relativePath,
+      path: pdfPath || "stored in database",
     });
   } catch (error) {
     console.error("Error uploading PDF:", error);

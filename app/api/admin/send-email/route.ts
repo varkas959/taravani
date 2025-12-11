@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, reportText, name, readingId, pdfPath } = await request.json();
+    const { email, reportText, name, readingId, pdfPath, pdfData } = await request.json();
 
     if (!email || !reportText || !name) {
       return NextResponse.json(
@@ -84,10 +84,30 @@ Taravani
     };
 
     // Attach PDF if provided
-    if (pdfPath) {
+    if (pdfPath || pdfData) {
       try {
-        const filePath = join(process.cwd(), "public", pdfPath);
-        const pdfBuffer = await readFile(filePath);
+        let pdfBuffer: Buffer;
+        
+        if (pdfData) {
+          // Use base64 data from database
+          pdfBuffer = Buffer.from(pdfData, "base64");
+        } else if (pdfPath) {
+          // Try to read from file system (local dev)
+          try {
+            const filePath = join(process.cwd(), "public", pdfPath);
+            pdfBuffer = await readFile(filePath);
+          } catch (error) {
+            console.error("Error reading PDF file:", error);
+            // If file read fails and no base64 data, skip attachment
+            if (!pdfData) {
+              throw error;
+            }
+            pdfBuffer = Buffer.from(pdfData, "base64");
+          }
+        } else {
+          throw new Error("No PDF data or path provided");
+        }
+
         mailOptions.attachments = [
           {
             filename: `Birth_Chart_Reading_${name.replace(/\s+/g, "_")}.pdf`,
@@ -95,8 +115,8 @@ Taravani
           },
         ];
       } catch (error) {
-        console.error("Error reading PDF file:", error);
-        // Continue without attachment if file read fails
+        console.error("Error preparing PDF attachment:", error);
+        // Continue without attachment if PDF processing fails
       }
     }
 

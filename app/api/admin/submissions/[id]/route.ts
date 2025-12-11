@@ -91,6 +91,7 @@ export async function PATCH(
             reportText: reading.reportText,
             name: reading.name,
             pdfPath: reading.reportPdfPath,
+            pdfData: reading.reportPdfData,
           }),
         });
       } catch (emailError) {
