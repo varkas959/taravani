@@ -3,14 +3,24 @@ import nodemailer from "nodemailer";
 export function createEmailTransporter() {
   // Check if using Brevo (formerly Sendinblue)
   if (process.env.BREVO_API_KEY) {
+    const brevoUser = process.env.BREVO_SMTP_USER || process.env.BREVO_EMAIL;
+    
+    if (!brevoUser) {
+      throw new Error("BREVO_SMTP_USER or BREVO_EMAIL must be set when using Brevo");
+    }
+    
     return nodemailer.createTransport({
       host: "smtp-relay.brevo.com",
       port: 587,
       secure: false, // true for 465, false for other ports
       auth: {
-        user: process.env.BREVO_SMTP_USER || process.env.BREVO_EMAIL,
-        pass: process.env.BREVO_API_KEY,
+        user: brevoUser,
+        pass: process.env.BREVO_API_KEY, // This should be the SMTP key from Brevo
       },
+      // Add connection timeout
+      connectionTimeout: 10000, // 10 seconds
+      greetingTimeout: 10000,
+      socketTimeout: 10000,
     });
   }
 
