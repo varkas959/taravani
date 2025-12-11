@@ -341,6 +341,9 @@ export default function AdminDashboard() {
                     Submitted
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-[#4a4a5e] uppercase tracking-wider">
+                    Email Sent
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-[#4a4a5e] uppercase tracking-wider">
                     Actions
                   </th>
                 </tr>
@@ -348,7 +351,7 @@ export default function AdminDashboard() {
               <tbody className="bg-white divide-y divide-[#e0e0e0]">
                 {readings.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className="px-6 py-8 text-center text-[#4a4a5e]">
+                    <td colSpan={7} className="px-6 py-8 text-center text-[#4a4a5e]">
                       No readings found
                     </td>
                   </tr>
@@ -375,6 +378,15 @@ export default function AdminDashboard() {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-[#4a4a5e]">
                         {new Date(reading.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-[#4a4a5e]">
+                        {reading.reportSentAt ? (
+                          <span className="text-green-600">
+                            {new Date(reading.reportSentAt).toLocaleString()}
+                          </span>
+                        ) : (
+                          <span className="text-gray-400">Not sent</span>
+                        )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
                         <Link

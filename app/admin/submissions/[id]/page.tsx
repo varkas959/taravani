@@ -253,14 +253,22 @@ export default function ReadingDetail() {
                   <option value="FAILED">Failed</option>
                 </select>
               </div>
-              {reading.reportSentAt && (
-                <div>
-                  <label className="text-sm font-medium text-[#4a4a5e]">Report Sent At</label>
-                  <p className="text-[#1a1a2e] font-medium">
-                    {new Date(reading.reportSentAt).toLocaleString()}
+              <div>
+                <label className="text-sm font-medium text-[#4a4a5e]">Email Status</label>
+                {reading.reportSentAt ? (
+                  <div>
+                    <p className="text-green-600 font-medium">
+                      ✓ Sent on {new Date(reading.reportSentAt).toLocaleString()}
+                    </p>
+                  </div>
+                ) : reading.status === "SENT" ? (
+                  <p className="text-yellow-600 font-medium">
+                    ⚠ Status is SENT but no timestamp recorded
                   </p>
-                </div>
-              )}
+                ) : (
+                  <p className="text-gray-500 font-medium">Not sent yet</p>
+                )}
+              </div>
               <div>
                 <label className="text-sm font-medium text-[#4a4a5e]">Delete At</label>
                 <p className="text-[#1a1a2e] font-medium text-sm">
@@ -375,6 +383,16 @@ export default function ReadingDetail() {
                 >
                   {isSaving ? "Sending..." : "Save & Send Email"}
                 </button>
+                {reading.reportSentAt && (
+                  <button
+                    onClick={() => handleSave(true)}
+                    disabled={isSaving || !reportText.trim()}
+                    className="bg-blue-600 text-white px-4 py-3 rounded-md font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    title="Resend email to customer"
+                  >
+                    {isSaving ? "Sending..." : "Resend Email"}
+                  </button>
+                )}
               </div>
               <p className="text-xs text-[#8a8a9e] mt-2">
                 When you click "Save & Send Email", the status will be set to SENT and the report will be emailed to the customer. If a PDF is attached, it will be included in the email.

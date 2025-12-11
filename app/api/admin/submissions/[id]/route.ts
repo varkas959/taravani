@@ -82,7 +82,7 @@ export async function PATCH(
     // If sendEmail is true, trigger email sending
     if (validated.sendEmail && reading.reportText) {
       try {
-        await fetch(`${request.nextUrl.origin}/api/admin/send-email`, {
+        const emailResponse = await fetch(`${request.nextUrl.origin}/api/admin/send-email`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -94,6 +94,16 @@ export async function PATCH(
             pdfData: reading.reportPdfData,
           }),
         });
+
+        if (!emailResponse.ok) {
+          const errorData = await emailResponse.json();
+          console.error("Error sending email:", errorData);
+          // Update status to FAILED if email fails
+          await prisma.reading.update({
+            where: { id: reading.id },
+            data: { status: "FAILED" },
+          });
+        }
       } catch (emailError) {
         console.error("Error sending email:", emailError);
         // Update status to FAILED if email fails
