@@ -14,6 +14,7 @@ interface Reading {
   status: string;
   reportText: string | null;
   reportPdfPath: string | null;
+  reportPdfData: string | null;
   reportSentAt: string | null;
   createdAt: string;
   deleteAt: string;
@@ -302,20 +303,52 @@ export default function ReadingDetail() {
                     disabled={isUploading}
                     className="block w-full text-sm text-[#4a4a5e] file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#d4af37] file:text-[#1a1a2e] hover:file:bg-[#c4a027] file:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   />
-                  {reading?.reportPdfPath && (
+                  {(reading?.reportPdfPath || reading?.reportPdfData) && (
                     <div className="flex items-center gap-2 text-sm text-green-600">
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                       </svg>
-                      <span>PDF attached: {reading.reportPdfPath.split('/').pop()}</span>
-                      <a
-                        href={reading.reportPdfPath}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-[#d4af37] hover:text-[#1a1a2e] underline ml-2"
-                      >
-                        View
-                      </a>
+                      <span>PDF attached</span>
+                      {reading.reportPdfPath ? (
+                        <>
+                          <span className="text-[#4a4a5e]">({reading.reportPdfPath.split('/').pop()})</span>
+                          <a
+                            href={reading.reportPdfPath}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#d4af37] hover:text-[#1a1a2e] underline ml-2"
+                          >
+                            View
+                          </a>
+                        </>
+                      ) : reading.reportPdfData ? (
+                        <>
+                          <span className="text-[#4a4a5e] ml-2">(stored in database)</span>
+                          <button
+                            onClick={() => {
+                              const byteCharacters = atob(reading.reportPdfData!);
+                              const byteNumbers = new Array(byteCharacters.length);
+                              for (let i = 0; i < byteCharacters.length; i++) {
+                                byteNumbers[i] = byteCharacters.charCodeAt(i);
+                              }
+                              const byteArray = new Uint8Array(byteNumbers);
+                              const blob = new Blob([byteArray], { type: 'application/pdf' });
+                              const url = URL.createObjectURL(blob);
+                              const link = document.createElement('a');
+                              link.href = url;
+                              link.download = `Birth_Chart_Reading_${reading.name.replace(/\s+/g, '_')}.pdf`;
+                              link.target = '_blank';
+                              document.body.appendChild(link);
+                              link.click();
+                              document.body.removeChild(link);
+                              URL.revokeObjectURL(url);
+                            }}
+                            className="text-[#d4af37] hover:text-[#1a1a2e] underline ml-2"
+                          >
+                            Download
+                          </button>
+                        </>
+                      ) : null}
                     </div>
                   )}
                   {isUploading && (
