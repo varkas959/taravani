@@ -29,6 +29,7 @@ export default function ReadingDetail() {
   const [status, setStatus] = useState("NEW");
   const [isSaving, setIsSaving] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [isDeletingPdf, setIsDeletingPdf] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -116,6 +117,41 @@ export default function ReadingDetail() {
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
+    }
+  };
+
+  const handleDeletePdf = async () => {
+    if (!confirm("Are you sure you want to delete the attached PDF?")) {
+      return;
+    }
+
+    setIsDeletingPdf(true);
+    setMessage(null);
+
+    try {
+      const adminSession = JSON.parse(localStorage.getItem("adminSession") || "{}");
+      const response = await fetch(`/api/admin/submissions/${params.id}`, {
+        method: "PATCH",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${adminSession.id}`,
+        },
+        body: JSON.stringify({
+          deletePdf: true,
+        }),
+      });
+
+      if (response.ok) {
+        await fetchReading();
+        setMessage({ type: "success", text: "PDF deleted successfully!" });
+      } else {
+        const error = await response.json();
+        setMessage({ type: "error", text: error.message || "Failed to delete PDF" });
+      }
+    } catch (error) {
+      setMessage({ type: "error", text: "Error deleting PDF" });
+    } finally {
+      setIsDeletingPdf(false);
     }
   };
 
@@ -312,51 +348,61 @@ export default function ReadingDetail() {
                     className="block w-full text-sm text-[#4a4a5e] file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#d4af37] file:text-[#1a1a2e] hover:file:bg-[#c4a027] file:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   />
                   {(reading?.reportPdfPath || reading?.reportPdfData) && (
-                    <div className="flex items-center gap-2 text-sm text-green-600">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      <span>PDF attached</span>
-                      {reading.reportPdfPath ? (
-                        <>
-                          <span className="text-[#4a4a5e]">({reading.reportPdfPath.split('/').pop()})</span>
-                          <a
-                            href={reading.reportPdfPath}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[#d4af37] hover:text-[#1a1a2e] underline ml-2"
-                          >
-                            View
-                          </a>
-                        </>
-                      ) : reading.reportPdfData ? (
-                        <>
-                          <span className="text-[#4a4a5e] ml-2">(stored in database)</span>
-                          <button
-                            onClick={() => {
-                              const byteCharacters = atob(reading.reportPdfData!);
-                              const byteNumbers = new Array(byteCharacters.length);
-                              for (let i = 0; i < byteCharacters.length; i++) {
-                                byteNumbers[i] = byteCharacters.charCodeAt(i);
-                              }
-                              const byteArray = new Uint8Array(byteNumbers);
-                              const blob = new Blob([byteArray], { type: 'application/pdf' });
-                              const url = URL.createObjectURL(blob);
-                              const link = document.createElement('a');
-                              link.href = url;
-                              link.download = `Birth_Chart_Reading_${reading.name.replace(/\s+/g, '_')}.pdf`;
-                              link.target = '_blank';
-                              document.body.appendChild(link);
-                              link.click();
-                              document.body.removeChild(link);
-                              URL.revokeObjectURL(url);
-                            }}
-                            className="text-[#d4af37] hover:text-[#1a1a2e] underline ml-2"
-                          >
-                            Download
-                          </button>
-                        </>
-                      ) : null}
+                    <div className="flex items-center justify-between p-2 bg-green-50 rounded border border-green-200">
+                      <div className="flex items-center gap-2 text-sm text-green-600">
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>PDF attached</span>
+                        {reading.reportPdfPath ? (
+                          <>
+                            <span className="text-[#4a4a5e] text-xs">({reading.reportPdfPath.split('/').pop()})</span>
+                            <a
+                              href={reading.reportPdfPath}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[#d4af37] hover:text-[#1a1a2e] underline text-xs"
+                            >
+                              View
+                            </a>
+                          </>
+                        ) : reading.reportPdfData ? (
+                          <>
+                            <span className="text-[#4a4a5e] text-xs">(stored in database)</span>
+                            <button
+                              onClick={() => {
+                                const byteCharacters = atob(reading.reportPdfData!);
+                                const byteNumbers = new Array(byteCharacters.length);
+                                for (let i = 0; i < byteCharacters.length; i++) {
+                                  byteNumbers[i] = byteCharacters.charCodeAt(i);
+                                }
+                                const byteArray = new Uint8Array(byteNumbers);
+                                const blob = new Blob([byteArray], { type: 'application/pdf' });
+                                const url = URL.createObjectURL(blob);
+                                const link = document.createElement('a');
+                                link.href = url;
+                                link.download = `Birth_Chart_Reading_${reading.name.replace(/\s+/g, '_')}.pdf`;
+                                link.target = '_blank';
+                                document.body.appendChild(link);
+                                link.click();
+                                document.body.removeChild(link);
+                                URL.revokeObjectURL(url);
+                              }}
+                              className="text-[#d4af37] hover:text-[#1a1a2e] underline text-xs"
+                            >
+                              Download
+                            </button>
+                          </>
+                        ) : null}
+                      </div>
+                      <button
+                        onClick={handleDeletePdf}
+                        disabled={isDeletingPdf}
+                        className="text-red-600 hover:text-red-800 text-xs font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Delete PDF"
+                      >
+                        {isDeletingPdf ? "Deleting..." : "Delete"}
+                      </button>
                     </div>
                   )}
                   {isUploading && (
@@ -368,18 +414,18 @@ export default function ReadingDetail() {
                 </div>
               </div>
 
-              <div className="flex gap-4 pt-4">
+              <div className="flex gap-2 pt-4">
                 <button
                   onClick={() => handleSave(false)}
                   disabled={isSaving}
-                  className="flex-1 bg-[#1a1a2e] text-white px-6 py-3 rounded-md font-medium hover:bg-[#2a2a3e] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-[#1a1a2e] text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-[#2a2a3e] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSaving ? "Saving..." : "Save Report"}
                 </button>
                 <button
                   onClick={() => handleSave(true)}
                   disabled={isSaving || !reportText.trim()}
-                  className="flex-1 bg-[#d4af37] text-[#1a1a2e] px-6 py-3 rounded-md font-medium hover:bg-[#c4a027] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 bg-[#d4af37] text-[#1a1a2e] px-4 py-2 rounded-md text-sm font-medium hover:bg-[#c4a027] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isSaving ? "Sending..." : "Save & Send Email"}
                 </button>
@@ -387,10 +433,10 @@ export default function ReadingDetail() {
                   <button
                     onClick={() => handleSave(true)}
                     disabled={isSaving || !reportText.trim()}
-                    className="bg-blue-600 text-white px-4 py-3 rounded-md font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="bg-blue-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     title="Resend email to customer"
                   >
-                    {isSaving ? "Sending..." : "Resend Email"}
+                    {isSaving ? "Sending..." : "Resend"}
                   </button>
                 )}
               </div>

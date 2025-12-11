@@ -7,6 +7,7 @@ const updateSchema = z.object({
   reportText: z.string().optional(),
   status: z.enum(["NEW", "IN_PROGRESS", "SENT", "FAILED"]).optional(),
   sendEmail: z.boolean().optional(),
+  deletePdf: z.boolean().optional(),
 });
 
 export async function GET(
@@ -72,6 +73,10 @@ export async function PATCH(
     }
     if (validated.status === "SENT" && validated.sendEmail) {
       updateData.reportSentAt = new Date();
+    }
+    if (validated.deletePdf) {
+      updateData.reportPdfPath = null;
+      updateData.reportPdfData = null;
     }
 
     const reading = await prisma.reading.update({
