@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter, useParams } from "next/navigation";
 
 interface Reading {
@@ -13,6 +13,7 @@ interface Reading {
   focusArea: string;
   status: string;
   reportText: string | null;
+  reportPdfPath: string | null;
   reportSentAt: string | null;
   createdAt: string;
   deleteAt: string;
@@ -26,7 +27,9 @@ export default function ReadingDetail() {
   const [reportText, setReportText] = useState("");
   const [status, setStatus] = useState("NEW");
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     const adminSession = localStorage.getItem("adminSession");
@@ -61,6 +64,57 @@ export default function ReadingDetail() {
       setMessage({ type: "error", text: "Error loading reading" });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== "application/pdf") {
+      setMessage({ type: "error", text: "Please upload a PDF file" });
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      setMessage({ type: "error", text: "File size must be less than 10MB" });
+      return;
+    }
+
+    setIsUploading(true);
+    setMessage(null);
+
+    try {
+      const adminSession = JSON.parse(localStorage.getItem("adminSession") || "{}");
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("readingId", params.id as string);
+
+      const response = await fetch("/api/admin/upload-pdf", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${adminSession.id}`,
+        },
+        body: formData,
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        // Refresh reading data to get updated PDF path
+        await fetchReading();
+        setMessage({ type: "success", text: "PDF uploaded successfully!" });
+      } else {
+        const error = await response.json();
+        setMessage({ type: "error", text: error.message || "Failed to upload PDF" });
+      }
+    } catch (error) {
+      setMessage({ type: "error", text: "Error uploading PDF" });
+    } finally {
+      setIsUploading(false);
+      // Reset file input
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -233,6 +287,46 @@ export default function ReadingDetail() {
                   placeholder="Write the personalised birth chart reading here..."
                 />
               </div>
+
+              {/* PDF Upload Section */}
+              <div className="border-t border-[#e0e0e0] pt-4">
+                <label className="block text-sm font-medium text-[#4a4a5e] mb-2">
+                  Attach PDF Report (Optional):
+                </label>
+                <div className="space-y-2">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf"
+                    onChange={handleFileUpload}
+                    disabled={isUploading}
+                    className="block w-full text-sm text-[#4a4a5e] file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#d4af37] file:text-[#1a1a2e] hover:file:bg-[#c4a027] file:cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  />
+                  {reading?.reportPdfPath && (
+                    <div className="flex items-center gap-2 text-sm text-green-600">
+                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span>PDF attached: {reading.reportPdfPath.split('/').pop()}</span>
+                      <a
+                        href={reading.reportPdfPath}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#d4af37] hover:text-[#1a1a2e] underline ml-2"
+                      >
+                        View
+                      </a>
+                    </div>
+                  )}
+                  {isUploading && (
+                    <p className="text-sm text-[#4a4a5e]">Uploading...</p>
+                  )}
+                  <p className="text-xs text-[#8a8a9e]">
+                    Maximum file size: 10MB. PDF will be attached to the email when sent.
+                  </p>
+                </div>
+              </div>
+
               <div className="flex gap-4 pt-4">
                 <button
                   onClick={() => handleSave(false)}
@@ -250,7 +344,7 @@ export default function ReadingDetail() {
                 </button>
               </div>
               <p className="text-xs text-[#8a8a9e] mt-2">
-                When you click "Save & Send Email", the status will be set to SENT and the report will be emailed to the customer.
+                When you click "Save & Send Email", the status will be set to SENT and the report will be emailed to the customer. If a PDF is attached, it will be included in the email.
               </p>
             </div>
           </div>

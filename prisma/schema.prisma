@@ -29,6 +29,7 @@ model Reading {
   focusArea     String
   status        String    @default("NEW") // NEW, IN_PROGRESS, SENT, FAILED
   reportText    String?
+  reportPdfPath String?   // Path to uploaded PDF file
   reportSentAt  DateTime?
   createdAt     DateTime  @default(now())
   deleteAt      DateTime  // Automatically set to createdAt + 30 days

@@ -90,6 +90,7 @@ export async function PATCH(
             email: reading.email,
             reportText: reading.reportText,
             name: reading.name,
+            pdfPath: reading.reportPdfPath,
           }),
         });
       } catch (emailError) {

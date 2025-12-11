@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { verifyAdminSession } from "@/lib/auth";
 import { createEmailTransporter, getFromEmail, isEmailConfigured } from "@/lib/email";
+import { readFile } from "fs/promises";
+import { join } from "path";
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,7 +15,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { email, reportText, name, readingId } = await request.json();
+    const { email, reportText, name, readingId, pdfPath } = await request.json();
 
     if (!email || !reportText || !name) {
       return NextResponse.json(
@@ -35,8 +37,8 @@ export async function POST(request: NextRequest) {
     // Create email transporter
     const transporter = createEmailTransporter();
 
-    // Send email
-    await transporter.sendMail({
+    // Prepare email options
+    const mailOptions: any = {
       from: getFromEmail(),
       to: email,
       subject: `Your birth chart reading, ${name}`,
@@ -50,6 +52,7 @@ export async function POST(request: NextRequest) {
           <div style="background: #fafafa; padding: 20px; margin: 20px 0; border-left: 4px solid #d4af37; white-space: pre-wrap; line-height: 1.6;">
             ${reportText.replace(/\n/g, "<br>")}
           </div>
+          ${pdfPath ? '<p style="margin-top: 20px;">A PDF version of your report is attached to this email.</p>' : ''}
           <p style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; font-size: 12px; color: #8a8a9e;">
             We store your details for 30 days so we can resend this if needed, then they are permanently deleted.
           </p>
@@ -70,6 +73,7 @@ Thank you for requesting your birth chart reading. Below is your personalised re
 
 ${reportText}
 
+${pdfPath ? '\nA PDF version of your report is attached to this email.\n' : ''}
 ---
 We store your details for 30 days so we can resend this if needed, then they are permanently deleted.
 
@@ -77,7 +81,27 @@ This report was personally written by a professional astrologer. If you have any
 
 Taravani
       `,
-    });
+    };
+
+    // Attach PDF if provided
+    if (pdfPath) {
+      try {
+        const filePath = join(process.cwd(), "public", pdfPath);
+        const pdfBuffer = await readFile(filePath);
+        mailOptions.attachments = [
+          {
+            filename: `Birth_Chart_Reading_${name.replace(/\s+/g, "_")}.pdf`,
+            content: pdfBuffer,
+          },
+        ];
+      } catch (error) {
+        console.error("Error reading PDF file:", error);
+        // Continue without attachment if file read fails
+      }
+    }
+
+    // Send email
+    await transporter.sendMail(mailOptions);
 
     return NextResponse.json({ success: true, message: "Email sent successfully" });
   } catch (error) {
