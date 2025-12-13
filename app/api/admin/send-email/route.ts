@@ -48,15 +48,34 @@ export async function POST(request: NextRequest) {
     
     // Verify transporter connection
     try {
+      console.log("🔍 Attempting SMTP connection verification...");
       await transporter.verify();
       console.log("✅ SMTP connection verified successfully");
     } catch (verifyError) {
-      console.error("❌ SMTP connection verification failed:", verifyError);
+      console.error("❌ SMTP connection verification failed:");
+      console.error("  - Error type:", verifyError instanceof Error ? verifyError.constructor.name : typeof verifyError);
+      console.error("  - Error message:", verifyError instanceof Error ? verifyError.message : String(verifyError));
+      
+      if (verifyError instanceof Error && 'code' in verifyError) {
+        console.error("  - Error code:", (verifyError as any).code);
+      }
+      if (verifyError instanceof Error && 'response' in verifyError) {
+        console.error("  - SMTP response:", (verifyError as any).response);
+      }
+      if (verifyError instanceof Error && 'responseCode' in verifyError) {
+        console.error("  - SMTP response code:", (verifyError as any).responseCode);
+      }
+      if (verifyError instanceof Error && 'command' in verifyError) {
+        console.error("  - Failed command:", (verifyError as any).command);
+      }
+      
       return NextResponse.json(
         { 
           message: "SMTP connection failed", 
           error: verifyError instanceof Error ? verifyError.message : "Unknown error",
-          details: "Check your Brevo credentials in Vercel environment variables"
+          details: "Check your Brevo credentials in Vercel environment variables",
+          errorCode: verifyError instanceof Error && 'code' in verifyError ? (verifyError as any).code : undefined,
+          smtpResponse: verifyError instanceof Error && 'response' in verifyError ? (verifyError as any).response : undefined,
         },
         { status: 500 }
       );
