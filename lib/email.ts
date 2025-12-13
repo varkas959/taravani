@@ -10,9 +10,12 @@ export function createEmailTransporter() {
     }
     
     // Log configuration (without exposing full password)
-    const smtpKeyLength = process.env.BREVO_API_KEY?.length || 0;
-    const smtpKeyPrefix = process.env.BREVO_API_KEY?.substring(0, 8) || "not set";
-    const smtpKeySuffix = process.env.BREVO_API_KEY?.substring(smtpKeyLength - 4) || "";
+    const smtpKey = process.env.BREVO_API_KEY || "";
+    const smtpKeyLength = smtpKey.length;
+    const smtpKeyPrefix = smtpKey.substring(0, 8) || "not set";
+    const smtpKeySuffix = smtpKey.substring(smtpKeyLength - 4) || "";
+    const smtpKeyTrimmed = smtpKey.trim();
+    const hasExtraSpaces = smtpKey !== smtpKeyTrimmed;
     
     console.log("🔐 Brevo SMTP Configuration:");
     console.log("  - Host: smtp-relay.brevo.com");
@@ -20,18 +23,23 @@ export function createEmailTransporter() {
     console.log("  - Username (BREVO_EMAIL):", brevoUser);
     console.log("  - Username length:", brevoUser.length);
     console.log("  - SMTP Key length:", smtpKeyLength);
+    console.log("  - SMTP Key has extra spaces:", hasExtraSpaces);
     console.log("  - SMTP Key prefix:", smtpKeyPrefix + "...");
     console.log("  - SMTP Key suffix:", "..." + smtpKeySuffix);
     console.log("  - Using BREVO_SMTP_USER:", !!process.env.BREVO_SMTP_USER);
     console.log("  - Using BREVO_EMAIL:", !!process.env.BREVO_EMAIL);
+    console.log("  - ⚠️  Note: Brevo SMTP keys are typically 40-60 chars. Your key is", smtpKeyLength, "chars.");
+    
+    // Use trimmed key to avoid space issues
+    const finalSmtpKey = smtpKeyTrimmed;
     
     return nodemailer.createTransport({
       host: "smtp-relay.brevo.com",
       port: 587,
       secure: false, // true for 465, false for other ports
       auth: {
-        user: brevoUser,
-        pass: process.env.BREVO_API_KEY, // This should be the SMTP key from Brevo
+        user: brevoUser.trim(), // Trim username to avoid space issues
+        pass: finalSmtpKey, // Use trimmed SMTP key
       },
       // Add connection timeout
       connectionTimeout: 10000, // 10 seconds
