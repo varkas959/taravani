@@ -26,56 +26,25 @@ export async function POST(request: NextRequest) {
 
     // If no email credentials are configured, return success (for development)
     if (!isEmailConfigured()) {
-      console.log("❌ Email not configured. Would send to:", email);
-      console.log("Report text:", reportText.substring(0, 100) + "...");
+      console.log("Email not configured. Would send to:", email);
       return NextResponse.json(
         { message: "Email service not configured. Check console for details." },
         { status: 200 }
       );
     }
 
-    // Log email configuration status
-    console.log("📧 Email Configuration Check:");
-    console.log("  - BREVO_API_KEY:", process.env.BREVO_API_KEY ? "✅ Set" : "❌ Not set");
-    console.log("  - BREVO_EMAIL:", process.env.BREVO_EMAIL || "Not set");
-    console.log("  - BREVO_FROM:", process.env.BREVO_FROM || "Not set");
-    console.log("  - SMTP_HOST:", process.env.SMTP_HOST || "Not set");
-    console.log("  - From Email:", getFromEmail());
-    console.log("  - To Email:", email);
-
     // Create email transporter
     const transporter = createEmailTransporter();
     
     // Verify transporter connection
     try {
-      console.log("🔍 Attempting SMTP connection verification...");
       await transporter.verify();
-      console.log("✅ SMTP connection verified successfully");
     } catch (verifyError) {
-      console.error("❌ SMTP connection verification failed:");
-      console.error("  - Error type:", verifyError instanceof Error ? verifyError.constructor.name : typeof verifyError);
-      console.error("  - Error message:", verifyError instanceof Error ? verifyError.message : String(verifyError));
-      
-      if (verifyError instanceof Error && 'code' in verifyError) {
-        console.error("  - Error code:", (verifyError as any).code);
-      }
-      if (verifyError instanceof Error && 'response' in verifyError) {
-        console.error("  - SMTP response:", (verifyError as any).response);
-      }
-      if (verifyError instanceof Error && 'responseCode' in verifyError) {
-        console.error("  - SMTP response code:", (verifyError as any).responseCode);
-      }
-      if (verifyError instanceof Error && 'command' in verifyError) {
-        console.error("  - Failed command:", (verifyError as any).command);
-      }
-      
+      console.error("SMTP connection verification failed:", verifyError instanceof Error ? verifyError.message : String(verifyError));
       return NextResponse.json(
         { 
           message: "SMTP connection failed", 
           error: verifyError instanceof Error ? verifyError.message : "Unknown error",
-          details: "Check your Brevo credentials in Vercel environment variables",
-          errorCode: verifyError instanceof Error && 'code' in verifyError ? (verifyError as any).code : undefined,
-          smtpResponse: verifyError instanceof Error && 'response' in verifyError ? (verifyError as any).response : undefined,
         },
         { status: 500 }
       );
@@ -165,17 +134,8 @@ Taravani
     }
 
     // Send email
-    console.log("📤 Attempting to send email...");
-    console.log("  - From:", mailOptions.from);
-    console.log("  - To:", mailOptions.to);
-    console.log("  - Subject:", mailOptions.subject);
-    console.log("  - Has PDF:", !!(pdfPath || pdfData));
-    
     const result = await transporter.sendMail(mailOptions);
-    
-    console.log("✅ Email sent successfully!");
-    console.log("  - Message ID:", result.messageId);
-    console.log("  - Response:", result.response);
+    console.log("Email sent successfully:", result.messageId);
     
     return NextResponse.json({ 
       success: true, 
@@ -184,29 +144,11 @@ Taravani
       response: result.response
     });
   } catch (error) {
-    console.error("❌ Error sending email:", error);
-    
-    // Log detailed error information
-    if (error instanceof Error) {
-      console.error("  - Error name:", error.name);
-      console.error("  - Error message:", error.message);
-      console.error("  - Error stack:", error.stack);
-      
-      // Check for specific Brevo errors
-      if (error.message.includes("Invalid login")) {
-        console.error("  - Issue: Invalid Brevo credentials");
-      } else if (error.message.includes("timeout")) {
-        console.error("  - Issue: Connection timeout to Brevo");
-      } else if (error.message.includes("ECONNREFUSED")) {
-        console.error("  - Issue: Cannot connect to Brevo SMTP server");
-      }
-    }
-    
+    console.error("Error sending email:", error instanceof Error ? error.message : String(error));
     return NextResponse.json(
       { 
         message: "Failed to send email", 
         error: error instanceof Error ? error.message : "Unknown error",
-        details: error instanceof Error ? error.stack : undefined
       },
       { status: 500 }
     );

@@ -26,34 +26,8 @@ export async function POST(request: NextRequest) {
     // Try to send email (don't fail if email fails)
     try {
       if (isEmailConfigured()) {
-        console.log("📧 Contact form email configuration:");
-        console.log("  - BREVO_API_KEY:", process.env.BREVO_API_KEY ? `Set (${process.env.BREVO_API_KEY.length} chars)` : "Not set");
-        console.log("  - BREVO_EMAIL:", process.env.BREVO_EMAIL || "Not set");
-        console.log("  - BREVO_SMTP_USER:", process.env.BREVO_SMTP_USER || "Not set");
-        console.log("  - From Email:", getFromEmail());
-        
         const transporter = createEmailTransporter();
-        
-        // Verify connection before sending
-        try {
-          console.log("🔍 Verifying SMTP connection for contact form...");
-          await transporter.verify();
-          console.log("✅ SMTP connection verified for contact form");
-        } catch (verifyError) {
-          console.error("❌ SMTP verification failed for contact form:");
-          console.error("  - Error type:", verifyError instanceof Error ? verifyError.constructor.name : typeof verifyError);
-          console.error("  - Error message:", verifyError instanceof Error ? verifyError.message : String(verifyError));
-          if (verifyError instanceof Error && 'code' in verifyError) {
-            console.error("  - Error code:", (verifyError as any).code);
-          }
-          if (verifyError instanceof Error && 'response' in verifyError) {
-            console.error("  - SMTP response:", (verifyError as any).response);
-          }
-          if (verifyError instanceof Error && 'responseCode' in verifyError) {
-            console.error("  - SMTP response code:", (verifyError as any).responseCode);
-          }
-          throw verifyError; // Re-throw to be caught by outer catch
-        }
+        await transporter.verify();
 
         const destinationEmail =
           process.env.CONTACT_TO ||
@@ -63,9 +37,7 @@ export async function POST(request: NextRequest) {
           process.env.BREVO_EMAIL;
 
         if (destinationEmail) {
-          console.log("  - To Email:", destinationEmail);
-          console.log("📤 Sending contact form email...");
-          const result = await transporter.sendMail({
+          await transporter.sendMail({
             from: getFromEmail(),
             to: destinationEmail,
             replyTo: email,
@@ -80,27 +52,11 @@ export async function POST(request: NextRequest) {
             `,
             text: `New message from ${name} (${email})\n\n${message}`,
           });
-          console.log("✅ Contact form email sent successfully:", result.messageId);
-        } else {
-          console.warn("⚠️ No destination email configured for contact form");
+          console.log("Contact form email sent successfully");
         }
       }
     } catch (emailError) {
-      console.error("❌ Error sending contact email:");
-      console.error("  - Error type:", emailError instanceof Error ? emailError.constructor.name : typeof emailError);
-      console.error("  - Error message:", emailError instanceof Error ? emailError.message : String(emailError));
-      if (emailError instanceof Error && 'code' in emailError) {
-        console.error("  - Error code:", (emailError as any).code);
-      }
-      if (emailError instanceof Error && 'response' in emailError) {
-        console.error("  - SMTP response:", (emailError as any).response);
-      }
-      if (emailError instanceof Error && 'responseCode' in emailError) {
-        console.error("  - SMTP response code:", (emailError as any).responseCode);
-      }
-      if (emailError instanceof Error && 'command' in emailError) {
-        console.error("  - Failed command:", (emailError as any).command);
-      }
+      console.error("Error sending contact email:", emailError instanceof Error ? emailError.message : String(emailError));
       // Don't fail the request if email fails - message is already saved
     }
 
