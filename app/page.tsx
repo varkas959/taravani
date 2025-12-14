@@ -506,7 +506,7 @@ export default function Home() {
             <div className="bg-white rounded-2xl p-6 md:p-8 lg:p-12 shadow-lg border border-[#e5e7eb]">
               <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8 mb-6 md:mb-8">
                 <div className="relative w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 rounded-full overflow-hidden shadow-lg border-4 border-white">
-                  <Image src="/images/astrologer.jpg" alt="Krishna - Taravani Astrologer" fill className="object-cover" sizes="(max-width: 768px) 128px, 192px" priority />
+                  <Image src="/images/astrologer.png" alt="Krishna - Taravani Astrologer" fill className="object-cover" sizes="(max-width: 768px) 128px, 192px" priority />
                 </div>
                 
                 <div className="text-center md:text-left flex-1">
