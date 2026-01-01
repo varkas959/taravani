@@ -507,7 +507,7 @@ export default function Home() {
               <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8 mb-6 md:mb-8">
                 <div className="relative w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 rounded-full overflow-hidden shadow-lg border-4 border-white flex-shrink-0">
                   <Image 
-                    src="/images/astrologer.png" 
+                    src={`/images/astrologer.png?v=${Date.now()}`} 
                     alt="Krishna - Taravani Astrologer" 
                     width={192}
                     height={192}
