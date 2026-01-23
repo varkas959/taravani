@@ -45,38 +45,61 @@ export async function POST(request: NextRequest) {
     deleteAt.setDate(deleteAt.getDate() + 30);
 
     // Create reading with PENDING payment status
-    const reading = await prisma.reading.create({
-      data: {
-        name: validated.fullName,
-        email: validated.email,
-        dob: new Date(validated.dateOfBirth),
-        timeOfBirth: validated.timeOfBirth,
-        placeOfBirth: validated.placeOfBirth,
-        focusArea: validated.focusArea,
-        status: "NEW",
-        deleteAt: deleteAt,
-        paymentStatus: "PENDING",
-        amount: amount,
-      },
-    });
+    let reading;
+    try {
+      reading = await prisma.reading.create({
+        data: {
+          name: validated.fullName,
+          email: validated.email,
+          dob: new Date(validated.dateOfBirth),
+          timeOfBirth: validated.timeOfBirth,
+          placeOfBirth: validated.placeOfBirth,
+          focusArea: validated.focusArea,
+          status: "NEW",
+          deleteAt: deleteAt,
+          paymentStatus: "PENDING",
+          amount: amount,
+        },
+      });
+    } catch (dbError) {
+      console.error("Database error creating reading:", dbError);
+      throw new Error(`Database error: ${dbError instanceof Error ? dbError.message : "Unknown database error"}`);
+    }
 
     // Create Razorpay order
-    const order = await razorpay.orders.create({
-      amount: amount,
-      currency: "INR",
-      receipt: `reading_${reading.id}`,
-      notes: {
-        readingId: reading.id,
-        name: validated.fullName,
-        email: validated.email,
-      },
-    });
+    let order;
+    try {
+      order = await razorpay.orders.create({
+        amount: amount,
+        currency: "INR",
+        receipt: `reading_${reading.id}`,
+        notes: {
+          readingId: reading.id,
+          name: validated.fullName,
+          email: validated.email,
+        },
+      });
+    } catch (razorpayError: any) {
+      console.error("Razorpay API error:", razorpayError);
+      // If Razorpay fails, delete the reading we just created
+      try {
+        await prisma.reading.delete({ where: { id: reading.id } });
+      } catch (deleteError) {
+        console.error("Error cleaning up reading after Razorpay failure:", deleteError);
+      }
+      throw new Error(`Razorpay error: ${razorpayError?.error?.description || razorpayError?.message || "Failed to create payment order"}`);
+    }
 
     // Update reading with Razorpay order ID
-    await prisma.reading.update({
-      where: { id: reading.id },
-      data: { razorpayOrderId: order.id },
-    });
+    try {
+      await prisma.reading.update({
+        where: { id: reading.id },
+        data: { razorpayOrderId: order.id },
+      });
+    } catch (updateError) {
+      console.error("Error updating reading with order ID:", updateError);
+      // Don't fail the request if update fails - order is already created
+    }
 
     return NextResponse.json(
       {
@@ -99,9 +122,22 @@ export async function POST(request: NextRequest) {
     }
     
     console.error("Error creating Razorpay order:", error);
+    console.error("Error details:", {
+      message: error instanceof Error ? error.message : "Unknown error",
+      stack: error instanceof Error ? error.stack : undefined,
+      name: error instanceof Error ? error.name : typeof error,
+    });
+    
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { message: "Internal server error", error: errorMessage },
+      { 
+        message: "Internal server error", 
+        error: errorMessage,
+        // Include more details in development
+        ...(process.env.NODE_ENV === "development" && {
+          details: error instanceof Error ? error.stack : String(error)
+        })
+      },
       { status: 500 }
     );
   }
