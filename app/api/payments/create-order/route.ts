@@ -17,6 +17,15 @@ const createOrderSchema = z.object({
 
 export async function POST(request: NextRequest) {
   try {
+    // Check Razorpay credentials first
+    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
+      console.error("Razorpay credentials not configured");
+      return NextResponse.json(
+        { message: "Razorpay credentials not configured" },
+        { status: 500 }
+      );
+    }
+
     const body = await request.json();
     
     // Validate input
@@ -24,16 +33,9 @@ export async function POST(request: NextRequest) {
     
     // Initialize Razorpay
     const razorpay = new Razorpay({
-      key_id: process.env.RAZORPAY_KEY_ID!,
-      key_secret: process.env.RAZORPAY_KEY_SECRET!,
+      key_id: process.env.RAZORPAY_KEY_ID,
+      key_secret: process.env.RAZORPAY_KEY_SECRET,
     });
-
-    if (!process.env.RAZORPAY_KEY_ID || !process.env.RAZORPAY_KEY_SECRET) {
-      return NextResponse.json(
-        { message: "Razorpay credentials not configured" },
-        { status: 500 }
-      );
-    }
 
     // Amount in paise (₹499 = 49900 paise)
     const amount = 49900;
@@ -89,6 +91,7 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     if (error instanceof z.ZodError) {
+      console.error("Validation error:", error.issues);
       return NextResponse.json(
         { message: "Validation error", errors: error.issues },
         { status: 400 }
@@ -96,8 +99,9 @@ export async function POST(request: NextRequest) {
     }
     
     console.error("Error creating Razorpay order:", error);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
-      { message: "Internal server error" },
+      { message: "Internal server error", error: errorMessage },
       { status: 500 }
     );
   }
